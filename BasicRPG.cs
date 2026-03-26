@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 class Entity
 {
@@ -27,12 +29,15 @@ class Player : Entity
 
 class Enemy : Entity
 {
-    public Enemy(int hp, int atk)
+	private string[] enemyTypes = new string[] {"Aigamuxa", "Antman Warrior", "Bunyip", "Ciguapa", "Cyclopes", "Lesser Dragon", "Lesser Fenrir", "Golem", "Vicious Gremlin", "Jersey Devil", "Kongamato", "Loch Ness Barracuda", "Nandi Bear", "Roc", "Orc", "Ogre", "Talos", "Troll", "Skeleton", "Draugr"};
+    public string type;
+	public Enemy(int hp, int atk)
     {
         this.health = hp;
         this.attack = atk;
         Random r = new Random();
         this.money = r.Next(1,100);
+		this.type = enemyTypes[r.Next(0,enemyTypes.Length)];
     }
 }
 
@@ -54,20 +59,28 @@ public class Program()
 {
     static void Main()
     {
-		string[,] map = new string[,] {{"Field", "House", "Cabbage Patch", "Forest"},{"Field", "House", "Cabbage Patch", "Forest"},{"Field", "House", "Cabbage Patch", "Forest"},{"Field", "House", "Cabbage Patch", "Forest"}};
+		string[,] map = {{"Castle Holdent","Wide Orchard","Rolling Fields","Urbos Hamlet","Western Badlands", "The Lunar Ocean", "Eaqeadore", "Gaglixar"},
+            {"Grassy Grove","Rushly Village","Swampy Knoll","Kwarmi Jungle","The Expanse", "Iceglen", "The Rune Dominion", "Gleakiomund"},
+            {"Arid Lowlands","Sand Banks","Vast Field","Pumpkin Patch","Northern Badlands", "Flellonet", "The Imagined Isle", "Strirranor"},
+            {"Low-lying Mires","Waterlogged Village","Riverside Cliffs","High Peaks","The Pitch Black", "The Savage Plane", "The Phantom Valley", "The Mad Reach"},
+            {"Hazey Frostlands","Frozen Lake","Snowy Town","Desolate Hills","Eastern Badlands", "The Miracle Territories", "The Final Moon", "Madmoor"},
+            {"Garooreeg Tropics", "Lodcad Wetlands", "The Bush of Kisudogob", "Starruryon", "The Paradise of Ballirama", "The Mold", "The Feral Country", "???"},
+            {"Riverwich Village", "Buteca Wild", "The Volcanic Jungle", "Flameshore", "Crabbiothra", "Wiommolon", "The Legend Province", "???"}};
 		
+		List<Enemy> enemies = new List<Enemy>();
+		Random r = new Random();
+
 		Console.WriteLine("Enter your name: ");
 		Player player = new Player(Console.ReadLine());
-        Enemy goblin = new Enemy(100, 20);
 		Boss demon = new Boss(1750, 75);
 
-		Write("Welcome to the game, " + player.name + "!");
-		Write("You are about to explore the new adventurous world!");
-		Write("Enjoy!");
+		Console.WriteLine("Welcome to the game, " + player.name + "!");
+		Console.WriteLine("You are about to explore the new adventurous world!");
+		Console.WriteLine("Enjoy!");
 		
 		while (true)
 		{
-			Write("Where would you like to go? [North] [South] [East] [West]");
+			Console.WriteLine("Where would you like to go? [North] [South] [East] [West]");
 			string direction = Console.ReadLine();
 			try
 			{
@@ -75,33 +88,67 @@ public class Program()
 				{
 					case "North":
 						player.position[0]++;
-						if (player.position[0]>3)
+						if (player.position[0]>7)
 						{player.position[0] = 0;}
 						break;
 					case "East":
 						player.position[1]++;
-						if (player.position[1]>3)
+						if (player.position[1]>7)
 						{player.position[1] = 0;}
 						break;
 					case "South":
 						player.position[0]--;
 						if (player.position[0]<0)
-						{player.position[0] = 3;}
+						{player.position[0] = 7;}
 						break;
 					case "West":
 						player.position[1]--;
 						if (player.position[1]<0)
-						{player.position[1] = 3;}
+						{player.position[1] = 7;}
 						break;
 					default:
 						break;
 				}
+
+				if (r.Next(0,100) > 50)
+				{
+					for (int i = 0; i < r.Next(0,3); i++)
+					{
+						Enemy e = new Enemy(100, 20);
+						enemies.Add(e);
+					}
+				}
+				if (enemies.Count > 0)
+				{
+					string[] validActions = {"attack", "defend", "run"};
+					foreach (Enemy enemy in enemies)
+					{
+						Console.WriteLine("You have encountered the {0}!", enemy.type);
+						while (player.health > 0 & enemy.health > 0)
+						{
+							bool validInput = false;
+							string action;
+							while (validInput == false)
+							{
+								Console.WriteLine("It is your turn to move. Type [Attack], [Defend] or [Run].");
+								action = Console.ReadLine();
+								if (validActions.Contains(action.ToLower()))
+								{validInput = true;}
+								else
+								{Console.WriteLine("Invalid input entered! Try again.");}
+							}
+						}
+					}
+				}
+				else
+				{
+					Console.WriteLine("You swiftly navigate past any danger.");
+				}
 			}
 			catch
-			{Write("Invalid command!");}
+			{Console.WriteLine("Invalid command!");}
+
 			Console.WriteLine("You are now in the {0}.",map[player.position[0],player.position[1]]);
 		}
     }
-	static void Write(string output)
-	{Console.WriteLine(output);}
 }
