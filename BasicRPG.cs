@@ -127,7 +127,9 @@ public class Program()
 						while (player.health > 0 & enemy.health > 0)
 						{
 							bool validInput = false;
-							string action;
+							bool defending = false;
+							bool running = false;
+							string action = "";
 							while (validInput == false)
 							{
 								Console.WriteLine("It is your turn to move. Type [Attack], [Defend] or [Run].");
@@ -136,6 +138,47 @@ public class Program()
 								{validInput = true;}
 								else
 								{Console.WriteLine("Invalid input entered! Try again.");}
+							}
+							switch (action.ToLower())
+							{
+								case "attack":
+									enemy.health -= player.attack;
+									if (enemy.health<0){enemy.health=0;}
+									Console.WriteLine("You strike the enemy for {0} damage! The enemy is on {1} health.", player.attack, enemy.health);
+									break;
+								case "defend":
+									defending = true;
+									Console.WriteLine("You raise your defences, mitigating a portion of damage if the enemy strikes you.");
+									break;
+								case "run":
+									if (r.Next(1,4)>2){running=true;}
+									break;
+								default:
+									break;
+									
+							}
+							if (running!=true)
+							{
+								Console.WriteLine("The {0} makes its move...", enemy.type);
+								if (r.Next(1,20)<18)
+								{
+									Console.WriteLine("The {0} attacks!", enemy.type);
+									if (defending)
+									{player.health-=(int)enemy.attack/4;
+									Console.WriteLine("The {0} dealt {1} damage!", enemy.type, (int)enemy.attack/4);}
+									else
+									{player.health-=enemy.attack;
+									Console.WriteLine("The {0} dealt {1} damage!", enemy.type, enemy.attack);}
+								}
+								else
+								{
+									Console.WriteLine("The {0} ran away!", enemy.type);
+									enemy.health = 0;
+								}
+							}
+							else
+							{
+								enemy.health = 0;
 							}
 						}
 					}
